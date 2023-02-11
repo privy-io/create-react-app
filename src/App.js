@@ -1,5 +1,5 @@
-import './App.css';
-import { usePrivy } from '@privy-io/react-auth';
+import "./App.css";
+import { usePrivy } from "@privy-io/react-auth";
 
 function App() {
   const { ready, authenticated, user, login, logout } = usePrivy();
@@ -17,6 +17,7 @@ function App() {
         {authenticated ? (
           <div>
             <textarea
+              readOnly
               value={JSON.stringify(user, null, 2)}
               style={{ width: "600px", height: "250px" }}
             />
