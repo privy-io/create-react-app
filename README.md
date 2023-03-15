@@ -4,14 +4,24 @@ This is a minimal template for integrating [Privy Auth](https://www.privy.io/) i
 
 ## Setup:
 
-First, clone this repository locally.
+1. Clone this repository and open it in your terminal.
 ```
 git clone https://github.com/privy-io/privy-create-react-app.git
 ```
 
-Next, run the command `npm i` to install the necessary dependencies.
+2. Install the necessary dependencies (including [Privy Auth](https://www.npmjs.com/package/@privy-io/react-auth)) with `npm`.
+```sh
+npm i 
+```
 
-Lastly, create your `.env` file by running `cp .env.example .env`. Then, add your Privy app ID to `.env`.
+3. Initialize your environment variables by copying the `.env.example` file to an `.env` file. Then, [paste your Privy App ID from the console](https://docs.privy.io/guide/console/api-keys) in `.env`.
+```sh
+# In your terminal, create .env from .env.example
+cp .env.example .env
+
+# Add your Privy App ID to .env
+REACT_APP_PRIVY_APP_ID=<your-privy-app-id>
+```
 
 ## Building locally:
 
@@ -19,6 +29,8 @@ In your project directory, run `npm run start`. You can now visit http://localho
 
 ## Check out:
 
-- `src/index.js` for how to use the `PrivyProvider` and pass in your Privy `appId`
+- `src/index.js` for how to use the `PrivyProvider` and initialize it with your Privy App ID
 - `src/App.js` for how to use the `usePrivy()` hook, fields like `authenticated` and `user`, and methods like `login` and `logout`
 - `config-overrides.js` for how to [handle common issues with Webpack 5](https://docs.privy.io/guide/troubleshooting/webpack)
+
+**Check out [our docs](https://docs.privy.io/) for more guidance around using Privy in your app!**
