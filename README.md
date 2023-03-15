@@ -1,21 +1,21 @@
 # Privy Auth `create-react-app` Starter
 
-This is a template for integrating [Privy Auth](https://www.privy.io/) into a new [`create-react-app`](https://create-react-app.dev/) project.
+This is a minimal template for integrating [Privy Auth](https://www.privy.io/) into a new [`create-react-app`](https://create-react-app.dev/) project.
 
 ## Setup:
 
-1. Clone this repository locally.
+First, clone this repository locally.
 ```
 git clone https://github.com/privy-io/privy-create-react-app.git
 ```
 
-2. Run the command `npm i` to install the necessary dependencies.
+Next, run the command `npm i` to install the necessary dependencies.
 
-3. Setup your environment by running `cp .env.example .env`, and adding your Privy app ID to `.env`.
+Lastly, create your `.env` file by running `cp .env.example .env`. Then, add your Privy app ID to `.env`.
 
 ## Building locally:
 
-In your project directory, run `npm run start`. You can now visit http://localhost:3000 to see the site and login with Privy!
+In your project directory, run `npm run start`. You can now visit http://localhost:3000 to see your app and login with Privy!
 
 ## Check out:
 
