@@ -1,6 +1,6 @@
 # Privy Auth `create-react-app` Starter
 
-This is a minimal template for integrating [Privy Auth](https://www.privy.io/) into a new [`create-react-app`](https://create-react-app.dev/) project.
+This is a minimal template for integrating [Privy Auth](https://www.privy.io/) into a new [`create-react-app`](https://create-react-app.dev/) project. Check out the deployed app [here](https://create-react-app.privy.io/)!
 
 ## Setup:
 
