@@ -6,7 +6,7 @@ This is a minimal template for integrating [Privy Auth](https://www.privy.io/) i
 
 1. Clone this repository and open it in your terminal.
 ```
-git clone https://github.com/privy-io/privy-create-react-app.git
+git clone https://github.com/privy-io/create-react-app.git
 ```
 
 2. Install the necessary dependencies (including [Privy Auth](https://www.npmjs.com/package/@privy-io/react-auth)) with `npm`.
