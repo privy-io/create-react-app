@@ -25,12 +25,11 @@ REACT_APP_PRIVY_APP_ID=<your-privy-app-id>
 
 ## Building locally:
 
-In your project directory, run `npm run start`. You can now visit http://localhost:3000 to see your app and login with Privy!
+In your project directory, run `npm run dev`. You can now visit http://localhost:5173 (or the port Vite chooses if 5173 is busy) to see your app and login with Privy!
 
 ## Check out:
 
-- `src/index.js` for how to use the `PrivyProvider` and initialize it with your Privy App ID
-- `src/App.js` for how to use the `usePrivy()` hook, fields like `authenticated` and `user`, and methods like `login` and `logout`
-- `config-overrides.js` for how to [handle common issues with Webpack 5](https://docs.privy.io/guide/troubleshooting/webpack)
+- `src/index.jsx` for how to use the `PrivyProvider` and initialize it with your Privy App ID
+- `src/App.jsx` for how to use the `usePrivy()` hook, fields like `authenticated` and `user`, and methods like `login` and `logout`
 
 **Check out [our docs](https://docs.privy.io/) for more guidance around using Privy in your app!**

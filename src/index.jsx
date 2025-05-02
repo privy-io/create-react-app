@@ -9,7 +9,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <PrivyProvider
-      appId={process.env.REACT_APP_PRIVY_APP_ID}
+      appId={import.meta.env.REACT_APP_PRIVY_APP_ID}
       onSuccess={(user) => console.log(`User ${user.id} logged in!`)}
     >
       <App />
