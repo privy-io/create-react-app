@@ -20,7 +20,7 @@ npm i
 cp .env.example .env
 
 # Add your Privy App ID to .env
-REACT_APP_PRIVY_APP_ID=<your-privy-app-id>
+VITE_PRIVY_APP_ID=<your-privy-app-id>
 ```
 
 ## Building locally:
