@@ -9,6 +9,8 @@ import {
   SessionSignersCard,
   WalletManagement,
   MFAEnrollmentCard,
+  FundingCard,
+  CrossappAccountsCard,
 } from "./components";
 
 import "./App.css";
@@ -32,6 +34,7 @@ function App() {
           <section className={["grid", "grid-cols-1", "gap-4"].join(" ")}>
             <PrivyUserObject />
             <CreateWalletCard />
+            <FundingCard />
             <LinkAccountsCard />
             <UnlinkAccountsCard />
             <WalletActionsCard />
@@ -48,6 +51,7 @@ function App() {
           >
             Login
           </button>
+          <CrossappAccountsCard />
         </div>
       )}
     </div>

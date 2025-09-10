@@ -6,3 +6,5 @@ export { default as WalletManagement } from "./wallet-management";
 export { default as MFAEnrollmentCard } from "./mfa-enrollment-card";
 export { default as LinkAccountsCard } from "./link-accounts-card";
 export { default as UnlinkAccountsCard } from "./unlink-accounts-card";
+export { default as FundingCard } from "./funding-card";
+export { default as CrossappAccountsCard } from "./crossapp-accounts-card";
