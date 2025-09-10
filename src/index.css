@@ -15,7 +15,6 @@ code {
 /* Shared utility-like classes (replacing Tailwind) */
 .card {
   width: 100%;
-  max-width: 24rem; /* ~max-w-sm */
   border-radius: 0.5rem; /* rounded-lg */
   border: 1px solid #e5e7eb; /* border-gray-200 */
   background: #ffffff; /* bg-white */

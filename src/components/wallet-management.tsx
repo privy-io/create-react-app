@@ -1,7 +1,6 @@
 import { useImportWallet, usePrivy, useWallets } from "@privy-io/react-auth";
 import React from "react";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -50,10 +49,7 @@ const WalletManagement = () => {
   };
 
   return (
-    <Expandable
-      title="Wallet management"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -96,16 +92,18 @@ const WalletManagement = () => {
         </div>
       )}
 
-      <div className={["mt-3", "grid", "grid-1", "grid-gap-3"].join(" ")}>
-        <button
-          onClick={handleExport}
-          disabled={status === "loading"}
-          className="btn"
-        >
-          {status === "loading" ? "Opening…" : "Export wallet"}
-        </button>
+      <div className={["mt-3"].join(" ")}>
+        <div className={["row", "wrap", "gap-2"].join(" ")}>
+          <button
+            onClick={handleExport}
+            disabled={status === "loading"}
+            className="btn"
+          >
+            {status === "loading" ? "Opening…" : "Export wallet"}
+          </button>
+        </div>
 
-        <div>
+        <div className="mt-3">
           <label className={["block", "text-xs", "font-medium"].join(" ")}>
             Private key (hex)
           </label>
@@ -115,7 +113,7 @@ const WalletManagement = () => {
             placeholder="0x..."
             className="input"
           />
-          <div className="mt-2">
+          <div className={["mt-2", "row", "wrap", "gap-2"].join(" ")}>
             <button
               onClick={handleImport}
               disabled={!privateKey || status === "loading"}
@@ -133,7 +131,7 @@ const WalletManagement = () => {
           </div>
         </div>
       </div>
-    </Expandable>
+    </div>
   );
 };
 

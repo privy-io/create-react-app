@@ -1,7 +1,6 @@
 import { useCreateWallet } from "@privy-io/react-auth";
 import React from "react";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
 
 const CreateWalletCard = () => {
   const [status, setStatus] = React.useState<
@@ -36,10 +35,7 @@ const CreateWalletCard = () => {
     }
   };
   return (
-    <Expandable
-      title="Create wallet"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -128,7 +124,7 @@ const CreateWalletCard = () => {
         )}
         {status === "loading" ? "Creating..." : "Create Wallet"}
       </button>
-    </Expandable>
+    </div>
   );
 };
 

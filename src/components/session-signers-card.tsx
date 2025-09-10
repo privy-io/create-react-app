@@ -1,7 +1,6 @@
 import { useSessionSigners, useWallets } from "@privy-io/react-auth";
 import React from "react";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
 
 const SessionSignersCard = () => {
   const { wallets } = useWallets();
@@ -21,7 +20,7 @@ const SessionSignersCard = () => {
         address: wallets[0]?.address,
         signers: [
           {
-            signerId: process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID!,
+            signerId: import.meta.env.VITE_PRIVY_SIGNER_ID!,
             policyIds: [],
           },
         ],
@@ -35,10 +34,7 @@ const SessionSignersCard = () => {
   };
 
   return (
-    <Expandable
-      title="Session signers"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -83,7 +79,7 @@ const SessionSignersCard = () => {
         </div>
       )}
 
-      <div className="mt-3">
+      <div className={["mt-3", "row", "wrap", "gap-2"].join(" ")}>
         <button
           onClick={handleAddSessionSigners}
           disabled={status === "loading"}
@@ -92,7 +88,7 @@ const SessionSignersCard = () => {
           {status === "loading" ? "Adding…" : "Add session signer"}
         </button>
       </div>
-    </Expandable>
+    </div>
   );
 };
 

@@ -1,11 +1,10 @@
 import {
-  LinkedAccountWithMetadata,
+  type LinkedAccountWithMetadata,
   usePrivy,
-  User,
+  type User,
 } from "@privy-io/react-auth";
 import React from "react";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
 
 const UnlinkAccountsCard = () => {
   const { user, unlinkGoogle, unlinkTwitter, unlinkGithub, unlinkWallet } =
@@ -76,10 +75,7 @@ const UnlinkAccountsCard = () => {
   };
 
   return (
-    <Expandable
-      title="Unlink accounts"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -110,7 +106,7 @@ const UnlinkAccountsCard = () => {
       )}
 
       {unlinkable && (
-        <div className={["mt-3", "grid", "grid-1", "grid-gap-2"].join(" ")}>
+        <div className={["mt-3", "row", "wrap", "gap-2"].join(" ")}>
           {buttons.map((b) => (
             <button
               key={b.key}
@@ -123,7 +119,7 @@ const UnlinkAccountsCard = () => {
           ))}
         </div>
       )}
-    </Expandable>
+    </div>
   );
 };
 

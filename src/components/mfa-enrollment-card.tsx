@@ -1,14 +1,10 @@
 import { useMfaEnrollment } from "@privy-io/react-auth";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
 
 const MFAEnrollemntCard = () => {
   const { showMfaEnrollmentModal } = useMfaEnrollment();
   return (
-    <Expandable
-      title="MFA Enrollment"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -30,7 +26,7 @@ const MFAEnrollemntCard = () => {
       >
         Enroll in MFA
       </button>
-    </Expandable>
+    </div>
   );
 };
 

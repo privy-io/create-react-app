@@ -1,13 +1,11 @@
 import { usePrivy } from "@privy-io/react-auth";
 
-import { Expandable } from "./ui/expandable";
 import { Badge } from "./ui/badge";
 
 const PrivyUserObject = () => {
   const { user } = usePrivy();
   return (
-    <Expandable
-      title="Privy user object"
+    <div
       className={["card", "card-padding", "max-h-500", "overflow-y-auto"].join(
         " "
       )}
@@ -25,7 +23,7 @@ const PrivyUserObject = () => {
       <pre className={["text-sm", "muted"].join(" ")}>
         {JSON.stringify(user, null, 2)}
       </pre>
-    </Expandable>
+    </div>
   );
 };
 

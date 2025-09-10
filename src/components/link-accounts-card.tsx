@@ -1,9 +1,26 @@
 import { useLinkAccount } from "@privy-io/react-auth";
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
+
 type Status = "idle" | "loading" | "success" | "error";
-type Action = "github" | "twitter" | "google" | "wallet" | null;
+type Action =
+  | "email"
+  | "phone"
+  | "wallet"
+  | "google"
+  | "apple"
+  | "twitter"
+  | "discord"
+  | "github"
+  | "linkedin"
+  | "tiktok"
+  | "line"
+  | "spotify"
+  | "instagram"
+  | "farcaster"
+  | "telegram"
+  | "passkey"
+  | null;
 
 const LinkAccountsCard = () => {
   const [status, setStatus] = useState<Status>("idle");
@@ -11,7 +28,7 @@ const LinkAccountsCard = () => {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
 
-  const { linkGithub, linkTwitter, linkGoogle, linkWallet } = useLinkAccount({
+  const handlers = useLinkAccount({
     onSuccess: () => {
       setResult("Linked successfully");
       setStatus("success");
@@ -22,25 +39,89 @@ const LinkAccountsCard = () => {
     },
   });
 
-  const badgeFor = (status: Status) => (
+  const items = useMemo(
+    () =>
+      [
+        { key: "email", label: "Link Email", run: () => handlers.linkEmail() },
+        { key: "phone", label: "Link Phone", run: () => handlers.linkPhone() },
+        {
+          key: "wallet",
+          label: "Link Wallet",
+          run: () => handlers.linkWallet(),
+        },
+        {
+          key: "google",
+          label: "Link Google",
+          run: () => handlers.linkGoogle(),
+        },
+        { key: "apple", label: "Link Apple", run: () => handlers.linkApple() },
+        {
+          key: "twitter",
+          label: "Link Twitter",
+          run: () => handlers.linkTwitter(),
+        },
+        {
+          key: "discord",
+          label: "Link Discord",
+          run: () => handlers.linkDiscord(),
+        },
+        {
+          key: "github",
+          label: "Link GitHub",
+          run: () => handlers.linkGithub(),
+        },
+        {
+          key: "linkedin",
+          label: "Link LinkedIn",
+          run: () => handlers.linkLinkedIn(),
+        },
+        {
+          key: "tiktok",
+          label: "Link Tiktok",
+          run: () => handlers.linkTiktok(),
+        },
+        { key: "line", label: "Link Line", run: () => handlers.linkLine() },
+        {
+          key: "spotify",
+          label: "Link Spotify",
+          run: () => handlers.linkSpotify(),
+        },
+        {
+          key: "instagram",
+          label: "Link Instagram",
+          run: () => handlers.linkInstagram(),
+        },
+        {
+          key: "farcaster",
+          label: "Link Farcaster",
+          run: () => handlers.linkFarcaster(),
+        },
+        {
+          key: "telegram",
+          label: "Link Telegram",
+          run: () => handlers.linkTelegram({ launchParams: {} }),
+        },
+        {
+          key: "passkey",
+          label: "Link Passkey",
+          run: () => handlers.linkPasskey(),
+        },
+      ] as { key: Action; label: string; run: () => void }[],
+    [handlers]
+  );
+
+  const badgeFor = (s: Status) => (
     <Badge
       variant={
-        status === "success"
-          ? "success"
-          : status === "error"
-          ? "destructive"
-          : "default"
+        s === "success" ? "success" : s === "error" ? "destructive" : "default"
       }
     >
-      {status}
+      {s}
     </Badge>
   );
 
   return (
-    <Expandable
-      title="Link Accounts"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -50,16 +131,16 @@ const LinkAccountsCard = () => {
             </Badge>
           </h3>
           <p className={["mt-1", "muted", "text-sm"].join(" ")}>
-            Link social accounts or external wallets to the current user. Privy
-            support almost every popular social provider, read more at{" "}
+            Link social accounts or external wallets to the current user. See
             <a
               href="https://docs.privy.io/user-management/users/linking-accounts"
               target="_blank"
               rel="noopener noreferrer"
               className="link"
             >
-              Link Accounts Documentation
+              &nbsp;docs
             </a>
+            .
           </p>
         </div>
       </div>
@@ -77,84 +158,33 @@ const LinkAccountsCard = () => {
         </div>
       )}
 
-      <div className={["mt-3", "grid", "grid-1", "grid-gap-2"].join(" ")}>
-        <button
-          onClick={() => {
-            setError(null);
-            setResult(null);
-            setCurrentAction("github");
-            setStatus("loading");
-            linkGithub();
-          }}
-          disabled={status === "loading" && currentAction === "github"}
-          className="btn"
-        >
-          {status === "loading" && currentAction === "github"
-            ? "Linking GitHub…"
-            : "Link GitHub"}
-        </button>
-        {currentAction === "github" && status !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>{badgeFor(status)}</div>
-        )}
-
-        <button
-          onClick={() => {
-            setError(null);
-            setResult(null);
-            setCurrentAction("twitter");
-            setStatus("loading");
-            linkTwitter();
-          }}
-          disabled={status === "loading" && currentAction === "twitter"}
-          className="btn"
-        >
-          {status === "loading" && currentAction === "twitter"
-            ? "Linking Twitter…"
-            : "Link Twitter"}
-        </button>
-        {currentAction === "twitter" && status !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>{badgeFor(status)}</div>
-        )}
-
-        <button
-          onClick={() => {
-            setError(null);
-            setResult(null);
-            setCurrentAction("google");
-            setStatus("loading");
-            linkGoogle();
-          }}
-          disabled={status === "loading" && currentAction === "google"}
-          className="btn"
-        >
-          {status === "loading" && currentAction === "google"
-            ? "Linking Google…"
-            : "Link Google"}
-        </button>
-        {currentAction === "google" && status !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>{badgeFor(status)}</div>
-        )}
-
-        <button
-          onClick={() => {
-            setError(null);
-            setResult(null);
-            setCurrentAction("wallet");
-            setStatus("loading");
-            linkWallet();
-          }}
-          disabled={status === "loading" && currentAction === "wallet"}
-          className="btn"
-        >
-          {status === "loading" && currentAction === "wallet"
-            ? "Linking wallet…"
-            : "Link wallet"}
-        </button>
-        {currentAction === "wallet" && status !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>{badgeFor(status)}</div>
-        )}
+      <div className={["mt-3", "row", "wrap", "gap-2"].join(" ")}>
+        {items.map(({ key, label, run }) => (
+          <div key={key!} className={["col", "gap-1"].join(" ")}>
+            <button
+              onClick={() => {
+                setError(null);
+                setResult(null);
+                setCurrentAction(key);
+                setStatus("loading");
+                run();
+              }}
+              disabled={status === "loading" && currentAction === key}
+              className="btn"
+            >
+              {status === "loading" && currentAction === key
+                ? `Linking ${label.replace("Link ", "")}…`
+                : label}
+            </button>
+            {currentAction === key && status !== "idle" && (
+              <div className={["row", "gap-2"].join(" ")}>
+                {badgeFor(status)}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-    </Expandable>
+    </div>
   );
 };
 

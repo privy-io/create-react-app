@@ -7,7 +7,6 @@ import {
 import { encodeFunctionData, erc20Abi } from "viem";
 import React from "react";
 import { Badge } from "./ui/badge";
-import { Expandable } from "./ui/expandable";
 
 const WalletActionsCard = () => {
   const { signMessage } = useSignMessage();
@@ -114,10 +113,7 @@ const WalletActionsCard = () => {
   };
 
   return (
-    <Expandable
-      title="Wallet actions"
-      className={["card", "card-padding"].join(" ")}
-    >
+    <div className={["card", "card-padding"].join(" ")}>
       <div className="row-between-start">
         <div>
           <h3 className="card-title">
@@ -140,7 +136,7 @@ const WalletActionsCard = () => {
         </div>
       )}
 
-      <div className={["mt-3", "grid", "grid-1", "grid-gap-2"].join(" ")}>
+      <div className={["mt-3", "row", "wrap", "gap-2"].join(" ")}>
         <button
           onClick={handleSignMessage}
           disabled={messageStatus === "loading"}
@@ -255,7 +251,7 @@ const WalletActionsCard = () => {
           </div>
         )}
       </div>
-    </Expandable>
+    </div>
   );
 };
 
