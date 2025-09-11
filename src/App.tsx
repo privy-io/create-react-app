@@ -45,15 +45,12 @@ function App() {
         </div>
       ) : (
         <div className="pt-2">
-          <button
-            className={["btn-lg", "px-4", "py-2"].join(" ")}
-            onClick={login}
-          >
+          <button className="btn-lg px-4 py-2" onClick={login}>
             Login
           </button>
-          <CrossappAccountsCard />
         </div>
-      )}
+      )}{" "}
+      <CrossappAccountsCard />
     </div>
   );
 }

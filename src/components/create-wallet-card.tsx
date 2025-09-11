@@ -1,37 +1,65 @@
-import { useCreateWallet } from "@privy-io/react-auth";
-import React from "react";
+import { useCreateWallet as useCreateEvmWallet } from "@privy-io/react-auth";
+import { useSolanaWallets } from "@privy-io/react-auth/solana";
+import { useCreateWallet as useCreateWalletExtendedChains } from "@privy-io/react-auth/extended-chains";
+import { useState } from "react";
 import { Badge } from "./ui/badge";
+type ChainType =
+  | "solana"
+  | "ethereum"
+  | "cosmos"
+  | "stellar"
+  | "sui"
+  | "tron"
+  | "bitcoin-segwit"
+  | "near"
+  | "ton"
+  | "starknet"
+  | "spark";
 
 const CreateWalletCard = () => {
-  const [status, setStatus] = React.useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [walletAddress, setWalletAddress] = React.useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const { createWallet } = useCreateWallet({
+  const [message, setMessage] = useState<string | null>(null);
+  const { createWallet: createWalletSolana } = useSolanaWallets();
+  const { createWallet: createWalletExtendedChains } =
+    useCreateWalletExtendedChains();
+
+  const { createWallet: createWalletEvm } = useCreateEvmWallet({
     onSuccess: ({ wallet }) => {
       console.log("Created wallet ", wallet);
-      setStatus("success");
-      // Most embedded wallets expose an EVM address at wallet.address
-      // Adjust here if you need a specific chain address
-      setWalletAddress(wallet?.address ?? null);
+      setMessage("success");
     },
     onError: (error) => {
-      console.error("Failed to create wallet with error ", error);
-      setErrorMessage(error?.toString() ?? "Failed to create wallet");
-      setStatus("error");
+      setMessage(error?.toString() ?? "Failed to create wallet");
     },
   });
 
-  const handleCreate = async () => {
-    setErrorMessage(null);
-    setStatus("loading");
-    try {
-      await createWallet({
-        createAdditional: true,
-      });
-    } catch {
-      // onError handler above will set error state
+  const handleCreate = async (chain: ChainType) => {
+    setMessage(null);
+    switch (chain) {
+      case "solana":
+        try {
+          await createWalletSolana({
+            createAdditional: true,
+          });
+          setMessage("success");
+        } catch (error) {
+          setMessage(error?.toString() ?? "Failed to create wallet");
+        }
+        break;
+      case "ethereum":
+        await createWalletEvm({
+          createAdditional: true,
+        });
+        break;
+      default:
+        try {
+          await createWalletExtendedChains({
+            chainType: chain,
+          });
+          setMessage("success");
+        } catch (e) {
+          setMessage(e?.toString?.() ?? "Failed to create wallet");
+        }
+        break;
     }
   };
   return (
@@ -50,80 +78,62 @@ const CreateWalletCard = () => {
             <code>createWallet</code>.
           </p>
         </div>
-        {status === "success" && (
-          <span className={["badge", "badge-success"].join(" ")}>
-            <svg
-              className="h-3.5 w-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M20 7L10 17L4 11"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Success
-          </span>
-        )}
       </div>
-
-      {walletAddress && (
+      {message && (
         <div
-          className={["mt-3", "alert", "text-xs"].join(" ")}
-          style={{
-            background: "#f9fafb",
-            color: "#374151",
-            borderColor: "#e5e7eb",
-          }}
+          className={[
+            "mt-2",
+            message === "success" ? "alert-success" : "alert-error",
+            "alert",
+            "text-xs",
+          ].join(" ")}
         >
-          <div className="card-title">Address</div>
-          <div className={["mt-0.5", "truncate", "font-mono"].join(" ")}>
-            {walletAddress}
-          </div>
+          {message}
         </div>
       )}
-
-      {errorMessage && status === "error" && (
-        <div className={["mt-2", "alert", "alert-error", "text-xs"].join(" ")}>
-          {errorMessage}
-        </div>
-      )}
-
-      <button
-        onClick={handleCreate}
-        disabled={status === "loading"}
-        className={["mt-3", "btn"].join(" ")}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "10px",
+          flexWrap: "wrap",
+          marginTop: "10px",
+        }}
       >
-        {status === "loading" && (
-          <svg
-            className="h-4 w-4 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            />
-          </svg>
-        )}
-        {status === "loading" ? "Creating..." : "Create Wallet"}
-      </button>
+        <button onClick={() => handleCreate("solana")} className="btn">
+          Create Solana Wallet
+        </button>
+        <button onClick={() => handleCreate("ethereum")} className="btn">
+          Create Ethereum Wallet
+        </button>
+        <button onClick={() => handleCreate("cosmos")} className="btn">
+          Create Cosmos Wallet
+        </button>
+        <button onClick={() => handleCreate("stellar")} className="btn">
+          Create Stellar Wallet
+        </button>
+        <button onClick={() => handleCreate("sui")} className="btn">
+          Create Sui Wallet
+        </button>
+        <button onClick={() => handleCreate("tron")} className="btn">
+          Create Tron Wallet
+        </button>
+        <button onClick={() => handleCreate("bitcoin-segwit")} className="btn">
+          Create Bitcoin Segwit Wallet
+        </button>
+        <button onClick={() => handleCreate("near")} className="btn">
+          Create Near Wallet
+        </button>
+        <button onClick={() => handleCreate("ton")} className="btn">
+          Create Ton Wallet
+        </button>
+        <button onClick={() => handleCreate("starknet")} className="btn">
+          Create Starknet Wallet
+        </button>
+        <button onClick={() => handleCreate("spark")} className="btn">
+          Create Spark Wallet
+        </button>
+      </div>
     </div>
   );
 };

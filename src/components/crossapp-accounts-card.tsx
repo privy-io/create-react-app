@@ -34,7 +34,7 @@ const CrossappAccountsCard = () => {
 
       {authenticated && (
         <button onClick={handleLinkCrossAppAccount} className="btn">
-          Link Cross App Account
+          Link Cross App Account (eg: Abstract)
         </button>
       )}
       {!authenticated && (

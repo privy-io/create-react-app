@@ -1,114 +1,144 @@
 import {
   useWallets,
-  useSendTransaction,
-  useSignMessage,
-  useSignTransaction,
+  useSendTransaction as useSendTransactionEvm,
+  useSignMessage as useSignMessageEvm,
+  useSignTransaction as useSignTransactionEvm,
 } from "@privy-io/react-auth";
-import { encodeFunctionData, erc20Abi } from "viem";
-import React from "react";
+import {
+  useSendTransaction as useSendTransactionSolana,
+  useSignMessage as useSignMessageSolana,
+  useSignTransaction as useSignTransactionSolana,
+  useConnectedStandardWallets,
+} from "@privy-io/react-auth/solana";
+import bs58 from "bs58";
+import { useState } from "react";
 import { Badge } from "./ui/badge";
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
 
 const WalletActionsCard = () => {
-  const { signMessage } = useSignMessage();
-  const { signTransaction } = useSignTransaction();
-  const { sendTransaction } = useSendTransaction();
-  const { wallets } = useWallets();
+  const { signMessage: signMessageEvm } = useSignMessageEvm();
+  const { signTransaction: signTransactionEvm } = useSignTransactionEvm();
+  const { sendTransaction: sendTransactionEvm } = useSendTransactionEvm();
+  const { wallets: walletsEvm } = useWallets();
+  const { signMessage: signMessageSolana } = useSignMessageSolana();
+  const { signTransaction: signTransactionSolana } = useSignTransactionSolana();
+  const { sendTransaction: sendTransactionSolana } = useSendTransactionSolana();
+  const { wallets: walletsSolana } = useConnectedStandardWallets();
 
-  type Status = "idle" | "loading" | "success" | "error";
-  const [messageStatus, setMessageStatus] = React.useState<Status>("idle");
-  const [txStatus, setTxStatus] = React.useState<Status>("idle");
-  const [sendStatus, setSendStatus] = React.useState<Status>("idle");
-  const [usdcStatus, setUsdcStatus] = React.useState<Status>("idle");
-
-  const [messageResult, setMessageResult] = React.useState<string | null>(null);
-  const [txResult, setTxResult] = React.useState<string | null>(null);
-  const [sendResult, setSendResult] = React.useState<string | null>(null);
-  const [usdcResult, setUsdcResult] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const handleSignMessage = async () => {
+  const [message, setMessage] = useState<string | null>(null);
+  const handleSignMessageEvm = async () => {
     try {
-      setError(null);
-      setMessageStatus("loading");
-      setMessageResult(null);
+      setMessage(null);
       const message = "Hello, world!";
-      const { signature } = await signMessage(
+      const { signature } = await signMessageEvm(
         { message },
-        { address: wallets[0]?.address }
+        { address: walletsEvm[0]?.address }
       );
-      setMessageResult(signature);
-      setMessageStatus("success");
+      setMessage(signature);
     } catch (e) {
-      setError(e?.toString?.() ?? "Failed to sign message");
-      setMessageStatus("error");
+      setMessage(e?.toString?.() ?? "Failed to sign message");
     }
   };
-
-  const handleSignTransaction = async () => {
+  const handleSignMessageSolana = async () => {
+    const message = "Hello world";
+    const signatureUint8Array = await signMessageSolana({
+      message: new TextEncoder().encode(message),
+      options: {
+        address: walletsSolana[0].address, // Optional: Specify the wallet to use for signing. If not provided, the first wallet will be used.
+        uiOptions: {
+          title: "Sign this message",
+        },
+      },
+    });
+    const signature = bs58.encode(signatureUint8Array);
+    setMessage(signature);
+  };
+  const handleSignTransactionEvm = async () => {
     try {
-      setError(null);
-      setTxStatus("loading");
-      setTxResult(null);
-      const transaction = await signTransaction(
+      setMessage(null);
+
+      const transaction = await signTransactionEvm(
         { to: "0xE3070d3e4309afA3bC9a6b057685743CF42da77C", value: 10000 },
-        { address: wallets[0]?.address }
+        { address: walletsEvm[0]?.address }
       );
-      setTxResult(
+      setMessage(
         typeof transaction === "string"
           ? transaction
           : JSON.stringify(transaction)
       );
-      setTxStatus("success");
     } catch (e) {
-      setError(e?.toString?.() ?? "Failed to sign transaction");
-      setTxStatus("error");
+      setMessage(e?.toString?.() ?? "Failed to sign transaction");
     }
   };
 
-  const handleSendTransaction = async () => {
+  const handleSignTransactionSolana = async () => {
+    const connection = new Connection("https://api.mainnet-beta.solana.com");
+
+    // Create your transaction (either legacy Transaction or VersionedTransaction)
+    const transaction = new Transaction(); // or new VersionedTransaction()
+    // Add your instructions to the transaction...
+
+    // Sign the transaction
+    const signedTransaction = await signTransactionSolana({
+      transaction: transaction,
+      connection: connection,
+      address: walletsSolana[0].address, // Optional: Specify the wallet to use for signing. If not provided, the first wallet will be used.
+    });
+    setMessage(JSON.stringify(signedTransaction));
+  };
+  const handleSendTransactionEvm = async () => {
     try {
-      setError(null);
-      setSendStatus("loading");
-      setSendResult(null);
-      const transaction = await sendTransaction(
+      setMessage(null);
+
+      const transaction = await sendTransactionEvm(
         { to: "0xE3070d3e4309afA3bC9a6b057685743CF42da77C", value: 10000 },
-        { address: wallets[0]?.address }
+        { address: walletsEvm[0]?.address }
       );
-      setSendResult(
+      setMessage(
         typeof transaction === "string"
           ? transaction
           : JSON.stringify(transaction)
       );
-      setSendStatus("success");
     } catch (e) {
-      setError(e?.toString?.() ?? "Failed to send transaction");
-      setSendStatus("error");
+      setMessage(e?.toString?.() ?? "Failed to send transaction");
     }
   };
+  const handleSendTransactionSolana = async () => {
+    const connection = new Connection("https://api.devnet.solana.com"); // Replace with your Solana RPC endpoint
 
-  const handleSendUSDCTransaction = async () => {
+    // Create your transaction (either legacy Transaction or VersionedTransaction)
+    const transaction = new Transaction(); // or new VersionedTransaction()
+
     try {
-      setError(null);
-      setUsdcStatus("loading");
-      setUsdcResult(null);
-      const data = encodeFunctionData({
-        abi: erc20Abi,
-        functionName: "transfer",
-        args: ["0xE3070d3e4309afA3bC9a6b057685743CF42da77C", BigInt(1000000)],
+      // Build and add your instructions to the transaction...
+      const transferInstruction = SystemProgram.transfer({
+        fromPubkey: new PublicKey(walletsSolana[0].address), // Replace with the sender's address
+        toPubkey: new PublicKey(walletsSolana[0].address), // Replace with the recipient's address
+        lamports: 1000000, // Amount in lamports (1 SOL = 1,000,000,000 lamports)
       });
-      const transaction = await sendTransaction({
-        to: "0xE3070d3e4309afA3bC9a6b057685743CF42da77C",
-        data,
+      transaction.add(transferInstruction);
+
+      // Fetch and set the latest blockhash
+      const latestBlockhash = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = latestBlockhash.blockhash; // Replace with the latest blockhash
+
+      // Set your address as the fee payer
+      transaction.feePayer = new PublicKey(walletsSolana[0].address); // Set fee payer
+
+      // Send the transaction
+      const receipt = await sendTransactionSolana({
+        transaction: transaction,
+        connection: connection,
+        address: walletsSolana[0].address, // Optional: Specify the wallet to use for signing. If not provided, the first wallet will be used.
       });
-      setUsdcResult(
-        typeof transaction === "string"
-          ? transaction
-          : JSON.stringify(transaction)
-      );
-      setUsdcStatus("success");
-    } catch (e) {
-      setError(e?.toString?.() ?? "Failed to send USDC transaction");
-      setUsdcStatus("error");
+      setMessage(JSON.stringify(receipt));
+    } catch (error) {
+      setMessage(error?.toString?.() ?? "Failed to send transaction");
     }
   };
 
@@ -130,126 +160,33 @@ const WalletActionsCard = () => {
         </div>
       </div>
 
-      {error && (
-        <div className={["mt-3", "alert", "alert-error", "text-xs"].join(" ")}>
-          {error}
-        </div>
+      {message && (
+        <div className={["mt-3", "alert", "text-xs"].join(" ")}>{message}</div>
       )}
 
       <div className={["mt-3", "row", "wrap", "gap-2"].join(" ")}>
-        <button
-          onClick={handleSignMessage}
-          disabled={messageStatus === "loading"}
-          className="btn"
-        >
-          {messageStatus === "loading" ? "Signing message…" : "Sign message"}
+        <button onClick={handleSignMessageEvm} className="btn">
+          Sign Message
         </button>
-        {messageStatus !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>
-            <Badge
-              variant={
-                messageStatus === "success"
-                  ? "success"
-                  : messageStatus === "error"
-                  ? "destructive"
-                  : "default"
-              }
-            >
-              {messageStatus}
-            </Badge>
-            {messageResult && (
-              <span className={["truncate", "text-xs", "muted"].join(" ")}>
-                {messageResult}
-              </span>
-            )}
-          </div>
-        )}
+        <button onClick={handleSignMessageSolana} className="btn">
+          Sign Message (Solana)
+        </button>
 
-        <button
-          onClick={handleSignTransaction}
-          disabled={txStatus === "loading"}
-          className="btn"
-        >
-          {txStatus === "loading" ? "Signing transaction…" : "Sign transaction"}
+        <button onClick={handleSignTransactionEvm} className="btn">
+          Sign Transaction
         </button>
-        {txStatus !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>
-            <Badge
-              variant={
-                txStatus === "success"
-                  ? "success"
-                  : txStatus === "error"
-                  ? "destructive"
-                  : "default"
-              }
-            >
-              {txStatus}
-            </Badge>
-            {txResult && (
-              <span className={["truncate", "text-xs", "muted"].join(" ")}>
-                {txResult}
-              </span>
-            )}
-          </div>
-        )}
 
-        <button
-          onClick={handleSendTransaction}
-          disabled={sendStatus === "loading"}
-          className="btn"
-        >
-          {sendStatus === "loading"
-            ? "Sending transaction…"
-            : "Send transaction"}
+        <button onClick={handleSignTransactionSolana} className="btn">
+          Sign Transaction (Solana)
         </button>
-        {sendStatus !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>
-            <Badge
-              variant={
-                sendStatus === "success"
-                  ? "success"
-                  : sendStatus === "error"
-                  ? "destructive"
-                  : "default"
-              }
-            >
-              {sendStatus}
-            </Badge>
-            {sendResult && (
-              <span className={["truncate", "text-xs", "muted"].join(" ")}>
-                {sendResult}
-              </span>
-            )}
-          </div>
-        )}
 
-        <button
-          onClick={handleSendUSDCTransaction}
-          disabled={usdcStatus === "loading"}
-          className="btn"
-        >
-          {usdcStatus === "loading" ? "Sending USDC…" : "Send USDC transaction"}
+        <button onClick={handleSendTransactionEvm} className="btn">
+          Send Transaction
         </button>
-        {usdcStatus !== "idle" && (
-          <div className={["row", "gap-2"].join(" ")}>
-            <Badge
-              variant={
-                usdcStatus === "success"
-                  ? "success"
-                  : usdcStatus === "error"
-                  ? "destructive"
-                  : "default"
-              }
-            >
-              {usdcStatus}
-            </Badge>
-            {usdcResult && (
-              <span className={["truncate", "text-xs", "muted"].join(" ")}>
-                {usdcResult}
-              </span>
-            )}
-          </div>
-        )}
+
+        <button onClick={handleSendTransactionSolana} className="btn">
+          Send Transaction (Solana)
+        </button>
       </div>
     </div>
   );

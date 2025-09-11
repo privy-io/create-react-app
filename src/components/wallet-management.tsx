@@ -1,50 +1,61 @@
-import { useImportWallet, usePrivy, useWallets } from "@privy-io/react-auth";
-import React from "react";
+import {
+  useImportWallet as useImportWalletEvm,
+  usePrivy,
+  useWallets,
+} from "@privy-io/react-auth";
+import { useState } from "react";
 import { Badge } from "./ui/badge";
-
-type Status = "idle" | "loading" | "success" | "error";
+import {
+  useImportWallet as useImportWalletSolana,
+  useExportWallet as useExportWalletSolana,
+  useConnectedStandardWallets,
+} from "@privy-io/react-auth/solana";
 
 const WalletManagement = () => {
-  const { exportWallet } = usePrivy();
-  const { wallets } = useWallets();
-  const { importWallet } = useImportWallet();
+  const { wallets: walletsEvm } = useWallets();
+  const { wallets: walletsSolana } = useConnectedStandardWallets();
+  const { exportWallet: exportWalletEvm } = usePrivy();
 
-  const [status, setStatus] = React.useState<Status>("idle");
-  const [error, setError] = React.useState<string | null>(null);
-  const [result, setResult] = React.useState<string | null>(null);
-  const [privateKey, setPrivateKey] = React.useState<string>("");
-  const [importedAddress, setImportedAddress] = React.useState<string | null>(
-    null
-  );
+  const { importWallet: importWalletEvm } = useImportWalletEvm();
+  const { exportWallet: exportWalletSolana } = useExportWalletSolana();
+  const { importWallet: importWalletSolana } = useImportWalletSolana();
 
-  const handleExport = async () => {
+  const [message, setMessage] = useState<string | null>(null);
+  const [privateKey, setPrivateKey] = useState<string>("");
+
+  const handleExport = async (chain: "ethereum" | "solana") => {
     try {
-      setError(null);
-      setResult(null);
-      setStatus("loading");
-      await exportWallet({ address: wallets[0]?.address as string });
-      setResult("Export modal shown");
-      setStatus("success");
+      if (chain === "ethereum") {
+        // export first privy wallet
+        const privyWallet = walletsEvm.find(
+          (wallet) => wallet.walletClientType === "privy"
+        );
+        await exportWalletEvm({ address: privyWallet?.address as string });
+      } else {
+        // export first solana wallet
+        await exportWalletSolana({
+          address: walletsSolana[0]?.address as string,
+        });
+      }
+      setMessage("Exported wallet");
     } catch (e) {
-      setError(e?.toString?.() ?? "Failed to export wallet");
-      setStatus("error");
+      setMessage(e?.toString?.() ?? "Failed to export wallet");
     }
   };
 
-  const handleImport = async () => {
+  const handleImport = async (chain: "ethereum" | "solana") => {
     try {
-      setError(null);
-      setResult(null);
-      setImportedAddress(null);
-      setStatus("loading");
-      const wallet = await importWallet({ privateKey });
-      setImportedAddress(wallet?.address ?? null);
-      setResult("Imported wallet");
-      setStatus("success");
-      setPrivateKey("");
+      if (chain === "ethereum") {
+        await importWalletEvm({ privateKey });
+      } else {
+        await importWalletSolana({ privateKey });
+      }
+
+      setMessage("success");
     } catch (e) {
-      setError(e?.toString?.() ?? "Failed to import wallet");
-      setStatus("error");
+      setMessage(e?.toString?.() ?? "Failed to import wallet");
+    } finally {
+      setPrivateKey("");
     }
   };
 
@@ -64,70 +75,45 @@ const WalletManagement = () => {
         </div>
       </div>
 
-      {status !== "idle" && (
-        <div className="mt-2">
-          <Badge
-            variant={
-              status === "success"
-                ? "success"
-                : status === "error"
-                ? "destructive"
-                : "default"
-            }
-          >
-            {status}
-          </Badge>
-        </div>
-      )}
-      {error && (
-        <div className={["mt-2", "alert", "alert-error", "text-xs"].join(" ")}>
-          {error}
-        </div>
-      )}
-      {result && (
-        <div
-          className={["mt-2", "alert", "alert-success", "text-xs"].join(" ")}
-        >
-          {result}
-        </div>
+      {message && (
+        <div className={["mt-2", "alert", "text-xs"].join(" ")}>{message}</div>
       )}
 
       <div className={["mt-3"].join(" ")}>
         <div className={["row", "wrap", "gap-2"].join(" ")}>
-          <button
-            onClick={handleExport}
-            disabled={status === "loading"}
-            className="btn"
-          >
-            {status === "loading" ? "Opening…" : "Export wallet"}
+          <button onClick={() => handleExport("ethereum")} className="btn">
+            Export wallet (Ethereum)
+          </button>
+          <button onClick={() => handleExport("solana")} className="btn">
+            Export wallet (Solana)
           </button>
         </div>
 
         <div className="mt-3">
           <label className={["block", "text-xs", "font-medium"].join(" ")}>
-            Private key (hex)
+            Private key (hex for Ethereum, base58 for Solana)
           </label>
           <input
             value={privateKey}
             onChange={(e) => setPrivateKey(e.target.value)}
-            placeholder="0x..."
+            placeholder="0x... (Ethereum) or base58... (Solana)"
             className="input"
           />
           <div className={["mt-2", "row", "wrap", "gap-2"].join(" ")}>
             <button
-              onClick={handleImport}
+              onClick={() => handleImport("ethereum")}
               disabled={!privateKey || status === "loading"}
               className="btn"
             >
-              {status === "loading" ? "Importing…" : "Import wallet"}
+              Import wallet (Ethereum)"
             </button>
-            {importedAddress && (
-              <div
-                className={["mt-2", "truncate", "text-xs", "muted"].join(" ")}
-              >
-                Imported: <span className="font-mono">{importedAddress}</span>
-              </div>
-            )}
+            <button
+              onClick={() => handleImport("solana")}
+              disabled={!privateKey || status === "loading"}
+              className="btn"
+            >
+              Import wallet (Solana)
+            </button>
           </div>
         </div>
       </div>

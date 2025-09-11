@@ -1,21 +1,16 @@
 import { useSessionSigners, useWallets } from "@privy-io/react-auth";
-import React from "react";
+import { useState } from "react";
 import { Badge } from "./ui/badge";
 
 const SessionSignersCard = () => {
   const { wallets } = useWallets();
   const { addSessionSigners } = useSessionSigners();
+  const { removeSessionSigners } = useSessionSigners();
 
-  type Status = "idle" | "loading" | "success" | "error";
-  const [status, setStatus] = React.useState<Status>("idle");
-  const [error, setError] = React.useState<string | null>(null);
-  const [result, setResult] = React.useState<string | null>(null);
-
+  const [message, setMessage] = useState<string | null>(null);
   const handleAddSessionSigners = async () => {
     try {
-      setError(null);
-      setResult(null);
-      setStatus("loading");
+      setMessage(null);
       await addSessionSigners({
         address: wallets[0]?.address,
         signers: [
@@ -25,11 +20,21 @@ const SessionSignersCard = () => {
           },
         ],
       });
-      setResult("Session signer added");
-      setStatus("success");
+      setMessage("Session signer added");
     } catch (e) {
-      setError(e?.toString?.() ?? "Failed to add session signer");
-      setStatus("error");
+      setMessage(e?.toString?.() ?? "Failed to add session signer");
+    }
+  };
+
+  const handleRemoveSessionSigners = async () => {
+    try {
+      setMessage(null);
+      await removeSessionSigners({
+        address: wallets[0]?.address,
+      });
+      setMessage("Session signer removed");
+    } catch (e) {
+      setMessage(e?.toString?.() ?? "Failed to remove session signer");
     }
   };
 
@@ -50,42 +55,16 @@ const SessionSignersCard = () => {
         </div>
       </div>
 
-      {status !== "idle" && (
-        <div className="mt-2">
-          <Badge
-            variant={
-              status === "success"
-                ? "success"
-                : status === "error"
-                ? "destructive"
-                : "default"
-            }
-          >
-            {status}
-          </Badge>
-        </div>
-      )}
-
-      {error && (
-        <div className={["mt-3", "alert", "alert-error", "text-xs"].join(" ")}>
-          {error}
-        </div>
-      )}
-      {result && (
-        <div
-          className={["mt-3", "alert", "alert-success", "text-xs"].join(" ")}
-        >
-          {result}
-        </div>
+      {message && (
+        <div className={["mt-3", "alert", "text-xs"].join(" ")}>{message}</div>
       )}
 
       <div className={["mt-3", "row", "wrap", "gap-2"].join(" ")}>
-        <button
-          onClick={handleAddSessionSigners}
-          disabled={status === "loading"}
-          className="btn"
-        >
-          {status === "loading" ? "Adding…" : "Add session signer"}
+        <button onClick={handleAddSessionSigners} className="btn">
+          Add Session Signer
+        </button>
+        <button onClick={handleRemoveSessionSigners} className="btn">
+          Remove Session Signer
         </button>
       </div>
     </div>
