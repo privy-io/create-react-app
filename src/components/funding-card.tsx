@@ -5,7 +5,7 @@ import {
 import { useFundWallet as useFundWalletSolana } from "@privy-io/react-auth/solana";
 import { Badge } from "./ui/badge";
 
-const FudningCard = () => {
+const FundingCard = () => {
   const { wallets } = useWallets();
   const { fundWallet: fundWalletEvm } = useFundWalletEvm();
   const { fundWallet: fundWalletSolana } = useFundWalletSolana();
@@ -68,4 +68,4 @@ const FudningCard = () => {
   );
 };
 
-export default FudningCard;
+export default FundingCard;
