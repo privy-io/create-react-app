@@ -28,7 +28,7 @@ const WalletManagement = () => {
       if (chain === "ethereum") {
         // export first privy wallet
         const privyWallet = walletsEvm.find(
-          (wallet) => wallet.walletClientType === "privy"
+          (wallet) => wallet.walletClientType === "privy",
         );
         await exportWalletEvm({ address: privyWallet?.address as string });
       } else {
@@ -102,14 +102,14 @@ const WalletManagement = () => {
           <div className={["mt-2", "row", "wrap", "gap-2"].join(" ")}>
             <button
               onClick={() => handleImport("ethereum")}
-              disabled={!privateKey || status === "loading"}
+              disabled={!privateKey}
               className="btn"
             >
               Import wallet (Ethereum)
             </button>
             <button
               onClick={() => handleImport("solana")}
-              disabled={!privateKey || status === "loading"}
+              disabled={!privateKey}
               className="btn"
             >
               Import wallet (Solana)
