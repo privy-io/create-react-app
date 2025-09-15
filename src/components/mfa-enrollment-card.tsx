@@ -1,7 +1,7 @@
 import { useMfaEnrollment } from "@privy-io/react-auth";
 import { Badge } from "./ui/badge";
 
-const MFAEnrollemntCard = () => {
+const MFAEnrollmentCard = () => {
   const { showMfaEnrollmentModal } = useMfaEnrollment();
   return (
     <div className={["card", "card-padding"].join(" ")}>
@@ -30,4 +30,4 @@ const MFAEnrollemntCard = () => {
   );
 };
 
-export default MFAEnrollemntCard;
+export default MFAEnrollmentCard;
