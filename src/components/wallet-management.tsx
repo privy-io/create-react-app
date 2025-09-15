@@ -105,7 +105,7 @@ const WalletManagement = () => {
               disabled={!privateKey || status === "loading"}
               className="btn"
             >
-              Import wallet (Ethereum)"
+              Import wallet (Ethereum)
             </button>
             <button
               onClick={() => handleImport("solana")}
