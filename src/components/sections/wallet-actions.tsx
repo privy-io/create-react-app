@@ -90,7 +90,7 @@ const WalletActions = () => {
         connection: connection,
         address: walletsSolana[0]?.address,
       });
-
+      console.log(signedTransaction);
       toast.success("Solana Transaction signed successfully");
     } catch (error) {
       toast.error("Failed to sign Solana transaction");
@@ -134,6 +134,7 @@ const WalletActions = () => {
         connection: connection,
         address: walletsSolana[0]?.address,
       });
+      console.log(receipt);
 
       toast.success("Solana Transaction sent successfully");
     } catch (error) {

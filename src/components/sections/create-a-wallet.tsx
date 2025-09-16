@@ -27,6 +27,7 @@ const CreateAWallet = () => {
       console.log("Created wallet ", wallet);
     },
     onError: (error) => {
+      console.log(error);
       toast.error("EVM wallet creation failed.");
     },
   });

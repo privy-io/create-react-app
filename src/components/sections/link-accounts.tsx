@@ -27,6 +27,7 @@ const LinkAccounts = () => {
       toast.success(`${linkMethod} account linked successfully`);
     },
     onError: (e) => {
+      console.log(e);
       toast.error(`Account linking failed`);
     },
   });

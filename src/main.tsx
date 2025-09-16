@@ -5,7 +5,6 @@ import App from "./App.tsx";
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
-import { base } from "viem/chains";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
