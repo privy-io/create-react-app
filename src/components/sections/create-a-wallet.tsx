@@ -4,7 +4,7 @@ import {
 } from "@privy-io/react-auth";
 import { useCreateWallet as useCreateWalletExtendedChains } from "@privy-io/react-auth/extended-chains";
 import Section from "../reusables/section";
-import { toast } from "react-toastify";
+import { showSuccessToast, showErrorToast } from "../ui/custom-toast";
 
 type SupportedExtendedChains =
   | "cosmos"
@@ -23,12 +23,12 @@ const CreateAWallet = () => {
   const { createWallet: createWalletSolana } = useSolanaWallets();
   const { createWallet: createWalletEvm } = useCreateEvmWallet({
     onSuccess: ({ wallet }) => {
-      toast.success("EVM wallet created successfully.");
+      showSuccessToast("EVM wallet created successfully.");
       console.log("Created wallet ", wallet);
     },
     onError: (error) => {
       console.log(error);
-      toast.error("EVM wallet creation failed.");
+      showErrorToast("EVM wallet creation failed.");
     },
   });
 
@@ -42,9 +42,10 @@ const CreateAWallet = () => {
       await createWalletSolana({
         createAdditional: true,
       });
-      toast.success("Solana wallet created successfully.");
+      showSuccessToast("Solana wallet created successfully.");
     } catch (error) {
-      toast.error("Solana wallet creation failed.");
+      console.log(error);
+      showErrorToast("Solana wallet creation failed.");
     }
   };
   const createWalletExtendedChainHandler = async (
@@ -54,9 +55,10 @@ const CreateAWallet = () => {
       await createWalletExtendedChains({
         chainType: chain,
       });
-      toast.success(`${chain} wallet successfully created`);
+      showSuccessToast(`${chain} wallet successfully created`);
     } catch (error) {
-      toast.error(`${chain} wallet creation failed.`);
+      console.log(error);
+      showErrorToast(`${chain} wallet creation failed.`);
     }
   };
 
@@ -74,23 +76,23 @@ const CreateAWallet = () => {
 
   const availableActions = [
     {
-      name: "Create Ethereum Wallet",
+      name: "Create Ethereum wallet",
       function: createWalletEvmHandler,
     },
     {
-      name: "Create Solana Wallet",
+      name: "Create Solana wallet",
       function: createWalletSolanaHandler,
     },
     ...supportedChains.map((chain) => ({
       name: `Create ${
         chain.charAt(0).toUpperCase() + chain.slice(1).replace("-", " ")
-      } Wallet`,
+      } wallet`,
       function: () => createWalletExtendedChainHandler(chain),
     })),
   ];
   return (
     <Section
-      name="Create a Wallet"
+      name="Create a wallet"
       description={
         "Creates a new wallet for the user. To limit to a single wallet per user, remove the createAdditional flag from createWallet"
       }

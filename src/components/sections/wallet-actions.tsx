@@ -1,3 +1,4 @@
+import { useState, useMemo, useEffect } from "react";
 import {
   useWallets,
   useSendTransaction as useSendTransactionEvm,
@@ -19,7 +20,13 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import Section from "../reusables/section";
-import { toast } from "react-toastify";
+import { showSuccessToast, showErrorToast } from "../ui/custom-toast";
+
+type WalletInfo = {
+  address: string;
+  type: "ethereum" | "solana";
+  name: string;
+};
 
 const WalletActions = () => {
   const { signMessage: signMessageEvm } = useSignMessageEvm();
@@ -32,55 +39,101 @@ const WalletActions = () => {
   const { sendTransaction: sendTransactionSolana } = useSendTransactionSolana();
   const { wallets: walletsSolana } = useConnectedStandardWallets();
 
+  const allWallets = useMemo((): WalletInfo[] => {
+    const evmWallets: WalletInfo[] = walletsEvm.map((wallet) => ({
+      address: wallet.address,
+      type: "ethereum" as const,
+      name: wallet.address,
+    }));
+
+    const solanaWallets: WalletInfo[] = walletsSolana.map((wallet) => ({
+      address: wallet.address,
+      type: "solana" as const,
+      name: wallet.address,
+    }));
+
+    return [...evmWallets, ...solanaWallets];
+  }, [walletsEvm, walletsSolana]);
+
+  const [selectedWallet, setSelectedWallet] = useState<WalletInfo | null>(null);
+
+  useEffect(() => {
+    if (allWallets.length > 0 && !selectedWallet) {
+      setSelectedWallet(allWallets[0]);
+    }
+  }, [allWallets, selectedWallet]);
+
+  const isEvmWallet = selectedWallet?.type === "ethereum";
+  const isSolanaWallet = selectedWallet?.type === "solana";
+
   const handleSignMessageEvm = async () => {
+    if (!isEvmWallet || !selectedWallet) {
+      showErrorToast("Please select an Ethereum wallet");
+      return;
+    }
     try {
       const message = "Hello, world!";
       const { signature } = await signMessageEvm(
         { message },
-        { address: walletsEvm[0]?.address }
+        { address: selectedWallet.address }
       );
-      toast.success(`EVM Message signed: ${signature.slice(0, 10)}...`);
+      showSuccessToast(`EVM Message signed: ${signature.slice(0, 10)}...`);
     } catch (error) {
-      toast.error("Failed to sign EVM message");
+      console.log(error);
+      showErrorToast("Failed to sign EVM message");
     }
   };
 
   const handleSignMessageSolana = async () => {
+    if (!isSolanaWallet || !selectedWallet) {
+      showErrorToast("Please select a Solana wallet");
+      return;
+    }
     try {
       const message = "Hello world";
       const signatureUint8Array = await signMessageSolana({
         message: new TextEncoder().encode(message),
         options: {
-          address: walletsSolana[0]?.address,
+          address: selectedWallet.address,
           uiOptions: {
             title: "Sign this message",
           },
         },
       });
       const signature = bs58.encode(signatureUint8Array);
-      toast.success(`Solana Message signed: ${signature.slice(0, 10)}...`);
+      showSuccessToast(`Solana Message signed: ${signature.slice(0, 10)}...`);
     } catch (error) {
-      toast.error("Failed to sign Solana message");
+      console.log(error);
+      showErrorToast("Failed to sign Solana message");
     }
   };
 
   const handleSignTransactionEvm = async () => {
+    if (!isEvmWallet || !selectedWallet) {
+      showErrorToast("Please select an Ethereum wallet");
+      return;
+    }
     try {
       const transaction = await signTransactionEvm(
         { to: "0xE3070d3e4309afA3bC9a6b057685743CF42da77C", value: 10000 },
-        { address: walletsEvm[0]?.address }
+        { address: selectedWallet.address }
       );
       const result =
         typeof transaction === "string"
           ? transaction
           : JSON.stringify(transaction);
-      toast.success(`EVM Transaction signed: ${result.slice(0, 20)}...`);
+      showSuccessToast(`EVM Transaction signed: ${result.slice(0, 20)}...`);
     } catch (error) {
-      toast.error("Failed to sign EVM transaction");
+      console.log(error);
+      showErrorToast("Failed to sign EVM transaction");
     }
   };
 
   const handleSignTransactionSolana = async () => {
+    if (!isSolanaWallet || !selectedWallet) {
+      showErrorToast("Please select a Solana wallet");
+      return;
+    }
     try {
       const connection = new Connection("https://api.mainnet-beta.solana.com");
       const transaction = new Transaction();
@@ -88,61 +141,76 @@ const WalletActions = () => {
       const signedTransaction = await signTransactionSolana({
         transaction: transaction,
         connection: connection,
-        address: walletsSolana[0]?.address,
+        address: selectedWallet.address,
       });
       console.log(signedTransaction);
-      toast.success("Solana Transaction signed successfully");
+      showSuccessToast("Solana Transaction signed successfully");
     } catch (error) {
-      toast.error("Failed to sign Solana transaction");
+      console.log(error);
+      showErrorToast("Failed to sign Solana transaction");
     }
   };
 
   const handleSendTransactionEvm = async () => {
+    if (!isEvmWallet || !selectedWallet) {
+      showErrorToast("Please select an Ethereum wallet");
+      return;
+    }
     try {
       const transaction = await sendTransactionEvm(
         { to: "0xE3070d3e4309afA3bC9a6b057685743CF42da77C", value: 10000 },
-        { address: walletsEvm[0]?.address }
+        { address: selectedWallet.address }
       );
       const result =
         typeof transaction === "string"
           ? transaction
           : JSON.stringify(transaction);
-      toast.success(`EVM Transaction sent: ${result.slice(0, 20)}...`);
+      showSuccessToast(`EVM Transaction sent: ${result.slice(0, 20)}...`);
     } catch (error) {
-      toast.error("Failed to send EVM transaction");
+      console.log(error);
+      showErrorToast("Failed to send EVM transaction");
     }
   };
 
   const handleSendTransactionSolana = async () => {
+    if (!isSolanaWallet || !selectedWallet) {
+      showErrorToast("Please select a Solana wallet");
+      return;
+    }
     try {
       const connection = new Connection("https://api.devnet.solana.com");
       const transaction = new Transaction();
 
       const transferInstruction = SystemProgram.transfer({
-        fromPubkey: new PublicKey(walletsSolana[0]?.address),
-        toPubkey: new PublicKey(walletsSolana[0]?.address),
+        fromPubkey: new PublicKey(selectedWallet.address),
+        toPubkey: new PublicKey(selectedWallet.address),
         lamports: 1000000,
       });
       transaction.add(transferInstruction);
 
       const latestBlockhash = await connection.getLatestBlockhash();
       transaction.recentBlockhash = latestBlockhash.blockhash;
-      transaction.feePayer = new PublicKey(walletsSolana[0]?.address);
+      transaction.feePayer = new PublicKey(selectedWallet.address);
 
       const receipt = await sendTransactionSolana({
         transaction: transaction,
         connection: connection,
-        address: walletsSolana[0]?.address,
+        address: selectedWallet.address,
       });
       console.log(receipt);
 
-      toast.success("Solana Transaction sent successfully");
+      showSuccessToast("Solana Transaction sent successfully");
     } catch (error) {
-      toast.error("Failed to send Solana transaction");
+      console.log(error);
+      showErrorToast("Failed to send Solana transaction");
     }
   };
 
   const handleSignTypedData = async () => {
+    if (!isEvmWallet || !selectedWallet) {
+      showErrorToast("Please select an Ethereum wallet");
+      return;
+    }
     try {
       const typedData = {
         domain: {
@@ -177,23 +245,32 @@ const WalletActions = () => {
       };
 
       const { signature } = await signTypedData(typedData, {
-        address: walletsEvm[0]?.address,
+        address: selectedWallet?.address,
       });
-      toast.success(`Typed Data signed: ${signature.slice(0, 10)}...`);
+      showSuccessToast(`Typed Data signed: ${signature.slice(0, 10)}...`);
     } catch (error) {
-      toast.error("Failed to sign typed data");
+      console.log(error);
+      showErrorToast("Failed to sign typed data");
     }
   };
 
   const handleSignRawHash = async () => {
+    if (!isEvmWallet || !selectedWallet) {
+      showErrorToast("Please select an Ethereum wallet");
+      return;
+    }
     try {
       // Find an embedded wallet that supports getProvider
       const embeddedWallet = walletsEvm.find(
-        (wallet) => wallet.walletClientType === "privy"
+        (wallet) =>
+          wallet.walletClientType === "privy" &&
+          wallet.address === selectedWallet.address
       );
 
       if (!embeddedWallet) {
-        toast.error("No embedded wallet available for raw hash signing");
+        showErrorToast(
+          "Selected wallet must be an embedded Privy wallet for raw hash signing"
+        );
         return;
       }
 
@@ -207,56 +284,116 @@ const WalletActions = () => {
         params: [rawHash],
       });
 
-      toast.success(`Raw Hash signed: ${signature.slice(0, 10)}...`);
+      showSuccessToast(`Raw Hash signed: ${signature.slice(0, 10)}...`);
     } catch (error) {
-      toast.error("Failed to sign raw hash");
+      console.log(error);
+      showErrorToast("Failed to sign raw hash");
     }
   };
 
   const availableActions = [
     {
-      name: "Sign Message (EVM)",
+      name: "Sign message (EVM)",
       function: handleSignMessageEvm,
+      disabled: !isEvmWallet,
     },
     {
-      name: "Sign Message (Solana)",
+      name: "Sign message (Solana)",
       function: handleSignMessageSolana,
+      disabled: !isSolanaWallet,
     },
     {
-      name: "Sign Typed Data (EVM)",
+      name: "Sign typed data (EVM)",
       function: handleSignTypedData,
+      disabled: !isEvmWallet,
     },
     {
-      name: "Sign Raw Hash (EVM)",
+      name: "Sign raw hash (EVM)",
       function: handleSignRawHash,
+      disabled: !isEvmWallet,
     },
     {
-      name: "Sign Transaction (EVM)",
+      name: "Sign transaction (EVM)",
       function: handleSignTransactionEvm,
+      disabled: !isEvmWallet,
     },
     {
-      name: "Sign Transaction (Solana)",
+      name: "Sign transaction (Solana)",
       function: handleSignTransactionSolana,
+      disabled: !isSolanaWallet,
     },
     {
-      name: "Send Transaction (EVM)",
+      name: "Send transaction (EVM)",
       function: handleSendTransactionEvm,
+      disabled: !isEvmWallet,
     },
     {
-      name: "Send Transaction (Solana)",
+      name: "Send transaction (Solana)",
       function: handleSendTransactionSolana,
+      disabled: !isSolanaWallet,
     },
   ];
 
   return (
     <Section
-      name="Wallet Actions"
+      name="Wallet actions"
       description={
         "Sign messages, typed data, raw hashes, and transactions, send transactions for both EVM and Solana wallets. Seamless experience with Privy embedded wallets."
       }
       filepath="src/components/sections/wallet-actions"
       actions={availableActions}
-    />
+    >
+      <div className="mb-4">
+        <label
+          htmlFor="wallet-select"
+          className="block text-sm font-medium mb-2"
+        >
+          Select wallet:
+        </label>
+        <div className="relative">
+          <select
+            id="wallet-select"
+            value={selectedWallet?.address || ""}
+            onChange={(e) => {
+              const wallet = allWallets.find(
+                (w) => w.address === e.target.value
+              );
+              setSelectedWallet(wallet || null);
+            }}
+            className="w-full pl-3 pr-8 py-2 border border-[#E2E3F0] rounded-md bg-white text-black focus:outline-none focus:ring-1 focus:ring-black appearance-none"
+          >
+            {allWallets.length === 0 ? (
+              <option value="">No wallets available</option>
+            ) : (
+              <>
+                <option value="">Select a wallet</option>
+                {allWallets.map((wallet) => (
+                  <option key={wallet.address} value={wallet.address}>
+                    {wallet.address} [
+                    {wallet.type === "ethereum" ? "ethereum" : "solana"}]
+                  </option>
+                ))}
+              </>
+            )}
+          </select>
+          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </Section>
   );
 };
 
