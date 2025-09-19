@@ -112,11 +112,11 @@ export const showSuccessToast = (message: string) => {
     closeButton: false,
     icon: false,
     className: "bg-transparent shadow-none p-0 m-0",
-    style: { 
-      background: "transparent", 
+    style: {
+      background: "transparent",
       boxShadow: "none",
       width: "auto",
-      maxWidth: "none"
+      maxWidth: "none",
     },
   });
 };
@@ -132,13 +132,12 @@ export const showErrorToast = (message: string) => {
     // Remove default toast wrapper look to avoid "toast inside toast"
     closeButton: false,
     icon: false,
-    className: "bg-transparent shadow-none p-0 m-0",
-    style: { 
-      background: "transparent", 
-      boxShadow: "none", 
-      marginTop: 16,
+    className: "bg-transparent shadow-none p-0 m-0 mt-4",
+    style: {
+      background: "transparent",
+      boxShadow: "none",
       width: "auto",
-      maxWidth: "none"
+      maxWidth: "none",
     },
   });
 };

@@ -39,7 +39,7 @@ const SessionSigners = () => {
         address: selectedWallet.address,
         signers: [
           {
-            signerId: process.env.NEXT_PUBLIC_PRIVY_SIGNER_ID!,
+            signerId: import.meta.env.VITE_PRIVY_SIGNER_ID!,
             policyIds: [],
           },
         ],
