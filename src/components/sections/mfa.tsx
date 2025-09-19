@@ -1,6 +1,6 @@
 import { useMfaEnrollment } from "@privy-io/react-auth";
 import Section from "../reusables/section";
-import { toast } from "react-toastify";
+import { showErrorToast } from "../ui/custom-toast";
 
 const MFA = () => {
   const { showMfaEnrollmentModal } = useMfaEnrollment();
@@ -10,7 +10,7 @@ const MFA = () => {
       showMfaEnrollmentModal();
     } catch (error) {
       const message = error?.toString?.() ?? "Failed to open MFA enrollment";
-      toast.error(message);
+      showErrorToast(message);
     }
   };
 
@@ -23,9 +23,9 @@ const MFA = () => {
 
   return (
     <Section
-      name="MFA Enrollment"
+      name="MFA enrollment"
       description={
-        "Enroll in MFA to enhance security. Privy support TOTP, SMS and Passkey MFA methods, once enrolled, you can use to perform sensitive wallet actions."
+        "Enroll in MFA to enhance security. Privy supports TOTP, SMS, and Passkey MFA methods. Once enrolled, you can use MFA to perform sensitive wallet actions."
       }
       filepath="src/components/sections/mfa"
       actions={availableActions}

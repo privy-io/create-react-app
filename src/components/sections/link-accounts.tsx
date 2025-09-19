@@ -1,6 +1,6 @@
 import { useCrossAppAccounts, useLinkAccount } from "@privy-io/react-auth";
 import Section from "../reusables/section";
-import { toast } from "react-toastify";
+import { showSuccessToast, showErrorToast } from "../ui/custom-toast";
 type Method =
   | "email"
   | "phone"
@@ -24,11 +24,11 @@ const LinkAccounts = () => {
   const { linkCrossAppAccount } = useCrossAppAccounts();
   const handlers = useLinkAccount({
     onSuccess: ({ linkMethod }) => {
-      toast.success(`${linkMethod} account linked successfully`);
+      showSuccessToast(`${linkMethod} account linked successfully`);
     },
     onError: (e) => {
       console.log(e);
-      toast.error(`Account linking failed`);
+      showErrorToast(`Account linking failed`);
     },
   });
   const availableOptions: Method[] = [
@@ -108,7 +108,7 @@ const LinkAccounts = () => {
   ];
   return (
     <Section
-      name="Link Accounts"
+      name="Link accounts"
       description={
         "Link social accounts or external wallets to the current user."
       }
